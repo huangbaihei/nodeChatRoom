@@ -22,7 +22,8 @@ function AddMsg(msg) {
 
 function btnLogin_onclick() {
   if (tbxUsername.value.trim() == '') {
-    alert('请输入用户名');
+    // alert('请输入用户名');
+    AddMsg('请输入用户名');
     return;
   }
   userName = tbxUsername.value.trim();
