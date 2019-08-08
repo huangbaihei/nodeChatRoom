@@ -11,7 +11,7 @@ server.listen(80);
 console.log('服务器已启动...');
 var io = sio.listen(server); // 使用socket.io维持http连接
 var names = []; // 存放客户端连接的数组
-io.sockets.on('connection', function (socket) {  // 使用io.sockets可以实现消息广播
+io.sockets.on('connection', function (socket) {  
   socket.on('login', function (name) {  // 监听客户端登入
     for (var i = 0; i < names.length; i++) {
       if (names[i] == name) {
@@ -20,8 +20,9 @@ io.sockets.on('connection', function (socket) {  // 使用io.sockets可以实现
       }
     }
     names.push(name);
-    io.sockets.emit('login', name);
-    io.sockets.emit('sendClients', names);
+    socket.emit('loginSuccess'); // 向此连接返回登录成功消息
+    socket.broadcast.emit('login', name); // socket.broadcast向除去建立该连接的客户端的所有客户端广播
+    io.sockets.emit('sendClients', names); // io.sockets可以向所有客户端广播
   });
   socket.on('chat', function (data) {  // 监听客户端聊天消息
     io.sockets.emit('chat', data);
@@ -33,7 +34,8 @@ io.sockets.on('connection', function (socket) {  // 使用io.sockets可以实现
         break;
       }
     }
-    socket.broadcast.emit('logout', name); // socket.broadcast也可以实现消息广播
+    socket.emit('logoutSuccess'); // 向此连接返回登出成功消息
+    socket.broadcast.emit('logout', name); 
     io.sockets.emit('sendClients', names);
   });
 });
